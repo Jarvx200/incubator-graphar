@@ -22,6 +22,8 @@ package org.apache.graphar.info;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.graphar.info.builder.ElementGenericAbstractBuilder;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -38,14 +40,13 @@ public class VertexInfo {
         return new VertexInfoBuilder();
     }
 
-    public static class VertexInfoBuilder {
+    public static class VertexInfoBuilder extends ElementGenericAbstractBuilder<VertexInfo, VertexInfoBuilder> {
         private String type;
         private long chunkSize;
-        private PropertyGroups propertyGroups;
-        private URI baseUri;
-        private VersionInfo version;
 
-        private VertexInfoBuilder() {}
+        private VertexInfoBuilder(){
+            super(VertexInfo.class,  VertexInfoBuilder.class);
+        }
 
         public VertexInfoBuilder type(String type) {
             this.type = type;
@@ -57,47 +58,19 @@ public class VertexInfo {
             return this;
         }
 
-        public VertexInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
-            this.propertyGroups = propertyGroups;
-            return this;
-        }
-
-        public VertexInfoBuilder baseUri(URI baseUri) {
-            this.baseUri = baseUri;
-
-            return this;
-        }
-
-        public VertexInfoBuilder baseUri(String baseUri) {
-            this.baseUri = URI.create(baseUri);
-
-            return this;
-        }
-
-        public VertexInfoBuilder version(VersionInfo version) {
-            this.version = version;
-
-            return this;
-        }
-
-        public VertexInfoBuilder version(String version) {
-            this.version = VersionParser.getVersion(version);
-
-            return this;
-        }
-
-        public VertexInfo build() {
+        @Override
+        protected void check() {
             if (chunkSize < 0) {
                 throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
             }
             if (baseUri == null) {
                 throw new IllegalArgumentException("Base URI cannot be null");
             }
-            return new VertexInfo(this);
         }
     }
 
-    private VertexInfo(VertexInfoBuilder builder) {
+
+    public VertexInfo(VertexInfoBuilder builder) {
         this.type = builder.type;
         this.chunkSize = builder.chunkSize;
         this.propertyGroups = builder.propertyGroups;

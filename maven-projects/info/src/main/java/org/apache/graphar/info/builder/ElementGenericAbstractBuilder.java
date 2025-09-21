@@ -1,29 +1,99 @@
 package org.apache.graphar.info.builder;
 
+import org.apache.graphar.info.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericAbstractBuilder<T, B>> {
+public abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericAbstractBuilder<T, B>> {
 
     private final Class<T> elementClass; // Needed for builded class constructor
     private final Class<B> builderClass;
 
-    public abstract B builder();
+    private List<PropertyGroup> propertyGroupsAsListTemp;
 
-    private ElementGenericAbstractBuilder(Class<T> elementClass, Class<B> builderClass) {
+    public VersionInfo version;
+    public URI baseUri;
+    public PropertyGroups propertyGroups;
+
+
+    protected ElementGenericAbstractBuilder(Class<T> elementClass, Class<B> builderClass) {
         this.elementClass = elementClass;
         this.builderClass = builderClass;
     }
 
 
-    abstract void check();
 
-    private B getSelf(){ // Generic safety for children
+
+    private B getSelf(){ // Generic safety for children at runtime
         return (B)this;
     }
 
+    public B version(VersionInfo version) {
+        this.version = version;
+
+        return getSelf();
+    }
+
+    public B version(String version) {
+        this.version = VersionParser.getVersion(version);
+
+        return getSelf();
+    }
+
+    public  B baseUri(URI baseUri) {
+        this.baseUri = baseUri;
+        return getSelf();
+    }
+
+    public B baseUri(String baseUri) {
+        this.baseUri = URI.create(baseUri);
+        return getSelf();
+    }
+
+    public B addPropertyGroup(PropertyGroup propertyGroup) {
+        if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+        propertyGroupsAsListTemp.add(propertyGroup);
+        return getSelf();
+    }
+
+    public B addPropertyGroups(List<PropertyGroup> propertyGroups) {
+        if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+        propertyGroupsAsListTemp.addAll(propertyGroups);
+        return getSelf();
+    }
+
+    public B propertyGroups(PropertyGroups propertyGroups) {
+        this.propertyGroups = propertyGroups;
+        return getSelf();
+    }
+
+
+    protected abstract void check();
+
     public final T build() {
         check();
+
+        if (propertyGroups == null && propertyGroupsAsListTemp != null) {
+            propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+        } else if (propertyGroupsAsListTemp != null) {
+            propertyGroups =
+                    propertyGroupsAsListTemp.stream()
+                            .map(propertyGroups::addPropertyGroupAsNew)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .reduce((first, second) -> second)
+                            .orElse(new PropertyGroups(new ArrayList<>()));
+        }
+
+        if (propertyGroups == null) {
+            throw new IllegalArgumentException("PropertyGroups is empty");
+        }
+
         try {
             Constructor<T> elementBuilderConstructor = elementClass.getConstructor(builderClass);
             return elementBuilderConstructor.newInstance(getSelf());

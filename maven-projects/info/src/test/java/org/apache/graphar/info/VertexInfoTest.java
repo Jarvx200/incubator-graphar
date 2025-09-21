@@ -21,6 +21,7 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -62,5 +63,12 @@ public class VertexInfoTest {
     public void invalidChunkSizeTest() {
         b.chunkSize(-1);
         b.build();
+    }
+
+    @Test
+    public void propertyGroupAppendTest() {
+        b.addPropertyGroup(TestUtil.pg1);
+        VertexInfo v = b.build();
+        Assert.assertEquals(List.of(TestUtil.pg3, TestUtil.pg1), v.getPropertyGroups());
     }
 }

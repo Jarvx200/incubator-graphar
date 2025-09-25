@@ -20,8 +20,11 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.apache.graphar.info.builder.ElementGenericAbstractBuilder;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;

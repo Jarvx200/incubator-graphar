@@ -98,5 +98,48 @@ public class PropertyGroup implements Iterable<Property> {
     public URI getBaseUri() {
         return baseUri;
     }
+
+    public boolean isValidated() {
+        // Check if base URI is not null or empty
+        if (baseUri == null || baseUri.toString().isEmpty()) {
+            return false;
+        }
+
+        // Check if file type is valid
+        if (fileType == null) {
+            return false;
+        }
+
+        // Check if properties are not empty
+        if (propertyList.isEmpty()) {
+            return false;
+        }
+
+        // Check if all properties are valid and have unique names
+        Map<String, Boolean> propertyNameSet = new HashMap<>();
+        for (Property property : propertyList) {
+            // Check if property name is not empty and data type is not null
+            if (property == null
+                    || property.getName() == null
+                    || property.getName().isEmpty()
+                    || property.getDataType() == null) {
+                return false;
+            }
+
+            // Check if property name is unique in the group
+            String propertyName = property.getName();
+            if (propertyNameSet.containsKey(propertyName)) {
+                return false;
+            }
+            propertyNameSet.put(propertyName, true);
+
+            // TODO: support list type in csv file
+            if (property.getDataType() == DataType.LIST && fileType == FileType.CSV) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 

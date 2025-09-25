@@ -21,9 +21,8 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
@@ -43,6 +42,7 @@ public class VertexInfoTest {
     public void testVertexInfoBasicBuilder() {
         VertexInfo v = b.build();
     }
+
     public void testBuildWithPrefix() {
         try {
             VertexInfo vertexInfo =

@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.apache.graphar.info.builder.ElementGenericAbstractBuilder;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
@@ -42,12 +41,13 @@ public class VertexInfo {
         return new VertexInfoBuilder();
     }
 
-    public static class VertexInfoBuilder extends ElementGenericAbstractBuilder<VertexInfo, VertexInfoBuilder> {
+    public static class VertexInfoBuilder
+            extends ElementGenericAbstractBuilder<VertexInfo, VertexInfoBuilder> {
         private String type;
         private long chunkSize;
 
-        private VertexInfoBuilder(){
-            super(VertexInfo.class,  VertexInfoBuilder.class);
+        private VertexInfoBuilder() {
+            super(VertexInfo.class, VertexInfoBuilder.class);
         }
 
         public VertexInfoBuilder type(String type) {
@@ -70,7 +70,6 @@ public class VertexInfo {
             }
         }
     }
-
 
     public VertexInfo(VertexInfoBuilder builder) {
         this.type = builder.type;

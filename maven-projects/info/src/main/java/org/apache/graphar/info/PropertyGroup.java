@@ -142,4 +142,3 @@ public class PropertyGroup implements Iterable<Property> {
         return true;
     }
 }
-

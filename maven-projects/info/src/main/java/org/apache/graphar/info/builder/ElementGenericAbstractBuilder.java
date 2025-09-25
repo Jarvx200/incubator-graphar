@@ -18,16 +18,16 @@
  */
 
 package org.apache.graphar.info.builder;
-import org.apache.graphar.info.*;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.graphar.info.*;
 
-public abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericAbstractBuilder<T, B>> {
+public abstract class ElementGenericAbstractBuilder<
+        T, B extends ElementGenericAbstractBuilder<T, B>> {
 
     private final Class<T> elementClass; // Needed for builded class constructor
     private final Class<B> builderClass;
@@ -38,17 +38,13 @@ public abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericA
     public URI baseUri;
     public PropertyGroups propertyGroups;
 
-
     protected ElementGenericAbstractBuilder(Class<T> elementClass, Class<B> builderClass) {
         this.elementClass = elementClass;
         this.builderClass = builderClass;
     }
 
-
-
-
-    private B getSelf(){ // Generic safety for children at runtime
-        return (B)this;
+    private B getSelf() { // Generic safety for children at runtime
+        return (B) this;
     }
 
     public B version(VersionInfo version) {
@@ -63,7 +59,7 @@ public abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericA
         return getSelf();
     }
 
-    public  B baseUri(URI baseUri) {
+    public B baseUri(URI baseUri) {
         this.baseUri = baseUri;
         return getSelf();
     }
@@ -89,7 +85,6 @@ public abstract class ElementGenericAbstractBuilder<T, B extends ElementGenericA
         this.propertyGroups = propertyGroups;
         return getSelf();
     }
-
 
     protected abstract void check();
 

@@ -19,8 +19,6 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.type.DataType;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.graphar.info.type.DataType;
 
 public class PropertyGroups {
     private final List<PropertyGroup> propertyGroupList;

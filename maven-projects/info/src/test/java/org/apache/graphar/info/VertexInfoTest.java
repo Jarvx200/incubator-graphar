@@ -23,6 +23,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,14 +42,33 @@ public class VertexInfoTest {
     @Test
     public void testVertexInfoBasicBuilder() {
         VertexInfo v = b.build();
+    public void testBuildWithPrefix() {
+        try {
+            VertexInfo vertexInfo =
+                    new VertexInfo(
+                            "person", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+            Assert.assertEquals(URI.create("vertex/person/"), vertexInfo.getBaseUri());
+        } catch (Exception e) {
+            Assert.fail("Should not throw exception: " + e.getMessage());
+        }
     }
 
     @Test
     public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
         VertexInfo v = b.baseUri(new URI("world")).build();
+    public void testIsValidated() {
+        // Test valid vertex info
+        VertexInfo validVertexInfo =
+                new VertexInfo(
+                        "person", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+        Assert.assertTrue(validVertexInfo.isValidated());
 
         Assert.assertEquals(new URI("world"), v.getBaseUri());
     }
+        // Test invalid vertex info with empty type
+        VertexInfo emptyTypeVertexInfo =
+                new VertexInfo("", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+        Assert.assertFalse(emptyTypeVertexInfo.isValidated());
 
     @Test(expected = RuntimeException.class)
     public void URInullTest() {
@@ -58,17 +80,38 @@ public class VertexInfoTest {
                         .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
                         .build();
     }
+        // Test invalid vertex info with zero chunk size
+        VertexInfo zeroChunkSizeVertexInfo =
+                new VertexInfo(
+                        "person", 0, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+        Assert.assertFalse(zeroChunkSizeVertexInfo.isValidated());
 
     @Test(expected = RuntimeException.class)
     public void invalidChunkSizeTest() {
         b.chunkSize(-1);
         b.build();
     }
+        // Test invalid vertex info with null prefix
+        VertexInfo nullPrefixVertexInfo =
+                new VertexInfo("person", 100, Arrays.asList(TestUtil.pg1), (URI) null, "gar/v1");
+        Assert.assertFalse(nullPrefixVertexInfo.isValidated());
 
     @Test
     public void propertyGroupAppendTest() {
         b.addPropertyGroup(TestUtil.pg1);
         VertexInfo v = b.build();
         Assert.assertEquals(List.of(TestUtil.pg3, TestUtil.pg1), v.getPropertyGroups());
+        // Test invalid vertex info with invalid property group
+        Property invalidProperty = new Property("", DataType.STRING, false, true);
+        PropertyGroup invalidPropertyGroup =
+                new PropertyGroup(Arrays.asList(invalidProperty), FileType.CSV, "invalid/");
+        VertexInfo invalidPropertyGroupVertexInfo =
+                new VertexInfo(
+                        "person",
+                        100,
+                        Arrays.asList(invalidPropertyGroup),
+                        "vertex/person/",
+                        "gar/v1");
+        Assert.assertFalse(invalidPropertyGroupVertexInfo.isValidated());
     }
 }
